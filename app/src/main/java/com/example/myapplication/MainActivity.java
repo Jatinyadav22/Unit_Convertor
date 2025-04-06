@@ -1,24 +1,34 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import android.content.SharedPreferences;
 
 public class MainActivity extends AppCompatActivity {
     private EditText inputValue;
     private Spinner fromUnit, toUnit;
     private Button convertButton;
+    private Button settingsButton; // ✅ New Button
     private TextView resultText;
 
     private final String[] units = {"Feet", "Inches", "Centimeters", "Meters", "Yards"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        // ✅ Load saved theme first
+        SharedPreferences preferences = getSharedPreferences("settings", MODE_PRIVATE);
+        boolean isDark = preferences.getBoolean("dark_mode", false);
+        AppCompatDelegate.setDefaultNightMode(
+                isDark ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO
+        );
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -27,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         toUnit = findViewById(R.id.toUnit);
         convertButton = findViewById(R.id.convertButton);
         resultText = findViewById(R.id.resultText);
+        settingsButton = findViewById(R.id.settingsButton); // ✅ Link to layout button
 
         // Populate Spinners
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, units);
@@ -35,6 +46,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Convert Button Click Listener
         convertButton.setOnClickListener(view -> performConversion());
+
+        // ✅ Settings Button Click Listener
+        settingsButton.setOnClickListener(view -> {
+            Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void performConversion() {
